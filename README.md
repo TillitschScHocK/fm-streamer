@@ -1,43 +1,49 @@
 # FM Streamer
-Are there not a lot of good FM radio stations in your vicinity? Have you ever wished you could receive your hometown station on your FM radio while you're away? Well this is the project for you!
 
-This is a simple ESP32/ESP8266 project that grabs an MP3 internet stream and bridges it to an FM transmitter, so that you can listen to the stream on your old-school FM radio.
+Gibt es in deiner Umgebung keine guten FM-Radiosender? Hast du dir schon einmal gewünscht, deinen Heimatsender auf deinem FM-Radio empfangen zu können, während du unterwegs bist? Dann ist dieses Projekt genau das Richtige für dich!
 
-# Setup
-If you're on Linux or Mac (or any system with GNU Make installed), install [arduino-cli](https://github.com/arduino/arduino-cli). This project is set up to work out of the box with it, and this will save you having to set up the ESP32/ESP8266 and required libraries in your Arduino IDE.
+Dies ist ein einfaches ESP32/ESP8266-Projekt, das einen MP3-Internetstream empfängt und an einen FM-Sender weiterleitet, sodass du den Stream auf deinem klassischen FM-Radio hören kannst.
 
-1. Run `make config-tools` to install libraries and ESP32/ESP8266 core.
-1. Rename `arduino_secrets.h.example` to `arduino_secrets.h` and change the wifi SSID and password in it to match the network you wish to attach to.
-1. If you want to change the radio streams, edit them in the `StationList` struct in fm-streamer.ino.
-1. Power on your board, connect its serial port to your computer, and see how the serial port comes up on your computer (e.g., `/dev/cu.usbserial-xxxx` or `COM1`, etc.). You'll use this value in the next step
-1. Run `make program SERIAL_PORT=<serialport> MCU_TYPE=<esp32|esp8266>` (replacing \<serialport\> with the name of the serial port from the previous step, and using either "esp32" or "esp8266" as the MCU_TYPE) to compile the code and upload it to your board.
+# Einrichtung
 
-# Usage
-Once you've followed the above steps and your board is programmed, the FM Streamer should connect to your wifi network, begin streaming the first mp3 stream in `StationList` (defined in webserver.h), and automatically broadcast over FM. There is a status output on the serial console that will tell you what's going on with the board as well.
+Falls du Linux oder macOS (oder ein anderes System mit installiertem GNU Make) verwendest, installiere [arduino-cli](https://github.com/arduino/arduino-cli). Dieses Projekt ist dafür konfiguriert, direkt mit arduino-cli zu arbeiten, was dir die Einrichtung des ESP32/ESP8266 und der benötigten Bibliotheken in der Arduino IDE erspart.
 
-I've implemented a web interface to the FM Streamer that allows you to control the station, volume, and transmit power of the FM Streamer. Note that this doesn't work on the ESP8266, as it runs out of RAM between the web server and audio streaming. However, it works well on the ESP32. Here's what it looks like:
+1. Führe `make config-tools` aus, um die Bibliotheken und den ESP32/ESP8266-Core zu installieren.
+2. Benenne `arduino_secrets.h.example` in `arduino_secrets.h` um und trage darin die SSID und das Passwort deines WLANs ein.
+3. Falls du die Radiostreams ändern möchtest, bearbeite sie in der `StationList`-Struktur in `fm-streamer.ino`.
+4. Schalte dein Board ein, verbinde dessen serielle Schnittstelle mit deinem Computer und finde heraus, wie die serielle Schnittstelle auf deinem Computer angezeigt wird (z. B. `/dev/cu.usbserial-xxxx` oder `COM1`, etc.). Du benötigst diesen Wert für den nächsten Schritt.
+5. Führe `make program SERIAL_PORT=<serialport> MCU_TYPE=<esp32|esp8266>` aus (ersetze `<serialport>` durch den Namen der seriellen Schnittstelle aus dem vorherigen Schritt und wähle entweder "esp32" oder "esp8266" als MCU_TYPE), um den Code zu kompilieren und auf dein Board hochzuladen.
+
+# Nutzung
+
+Sobald die oben genannten Schritte abgeschlossen und dein Board programmiert ist, verbindet sich der FM Streamer mit deinem WLAN, beginnt mit dem Streaming des ersten MP3-Streams aus der `StationList` (definiert in `webserver.h`) und sendet automatisch über FM. Es gibt eine Statusausgabe auf der seriellen Konsole, die anzeigt, was auf dem Board passiert.
+
+Ein Webinterface ermöglicht die Steuerung des Senders, der Lautstärke und der Sendeleistung des FM Streamers. Beachte, dass dies auf dem ESP8266 nicht funktioniert, da dieser nicht über genug RAM für den Webserver und das Audiostreaming verfügt. Auf dem ESP32 funktioniert es jedoch gut. So sieht es aus:
 
 <img src="./docs/webpage.png" width="400" />
 
 ---
 
-# Under the Hood
-This project consists of three hardware components:
-1. [ESP32 dev board](https://www.amazon.com/dp/B08D5ZD528) or [ESP3266 NodeMCU v1.0](https://www.amazon.com/gp/product/B010O1G1ES/)
-1. [Adafruit UDA1334A I2S Stereo DAC breakout board](https://www.adafruit.com/product/3678)
-1. [Adafruit Si4713 FM Transmitter breakout board](https://www.adafruit.com/product/1958)
+# Technik
+
+Dieses Projekt besteht aus drei Hardware-Komponenten:
+1. [ESP32 Dev Board](https://www.amazon.com/dp/B08D5ZD528) oder [ESP8266 NodeMCU v1.0](https://www.amazon.com/gp/product/B010O1G1ES/)
+2. [Adafruit UDA1334A I2S Stereo DAC Breakout Board](https://www.adafruit.com/product/3678)
+3. [Adafruit Si4713 FM Transmitter Breakout Board](https://www.adafruit.com/product/1958)
 
 ## Hardware
-These are wired together like so (for the ESP32):
+
+Diese werden wie folgt miteinander verbunden (für den ESP32):
 
 <img src="./docs/hardware-wiring.png" width="400" />
 
-Everything is powered from the ESP32 board's 3.3V output. The Si4713 FM transmitter is connected to the ESP32 over I2C, the UDA1334 DAC is connected to it over I2S, and then the UDA1334 DAC outputs audio to the Si4713 transmitter via analog stereo audio.
+Alles wird vom 3,3V-Ausgang des ESP32-Boards mit Strom versorgt. Der Si4713-FM-Sender ist über I2C mit dem ESP32 verbunden, der UDA1334-DAC ist über I2S verbunden, und der UDA1334-DAC gibt Audio über analoge Stereoausgänge an den Si4713-Sender weiter.
 
-I also wired a 4.7kΩ resistor from each of the DAC's analog audio outputs to GND to provide a bit of loading for it. I found that this helped reduce noise and clipping on the FM transmitter's input, although I did not experiment much with values or whether this is truly necessary.
+Ich habe auch einen 4,7kΩ-Widerstand von jedem der analogen Audioausgänge des DACs nach GND geschaltet, um eine leichte Last für den DAC zu schaffen. Dies hat geholfen, Rauschen und Clipping am Eingang des FM-Senders zu reduzieren, obwohl ich nicht viel mit den Werten experimentiert habe, um herauszufinden, ob dies wirklich notwendig ist.
 
 ## Software
-The software makes use of the [ESP8266Audio](https://github.com/earlephilhower/ESP8266Audio) library and [Adafruit's Si4713](https://github.com/adafruit/Adafruit-Si4713-Library) driver. The webserver uses the [ESPAsynWebserver](https://github.com/me-no-dev/ESPAsyncWebServer/) library.
+
+Die Software nutzt die [ESP8266Audio](https://github.com/earlephilhower/ESP8266Audio)-Bibliothek und den [Adafruit Si4713](https://github.com/adafruit/Adafruit-Si4713-Library)-Treiber. Der Webserver verwendet die [ESPAsyncWebServer](https://github.com/me-no-dev/ESPAsyncWebServer/)-Bibliothek.
 
 <img src="./docs/software-diagram.png" width="600" />
 
