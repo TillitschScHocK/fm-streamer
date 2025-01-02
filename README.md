@@ -1,3 +1,6 @@
+# Dieses Projekt ensteht noch und ist noch nicht fertig!!!!!!!
+# Komm in ein paar Tage wieder.
+
 # FM Streamer
 
 Gibt es in deiner Umgebung keine guten FM-Radiosender? Hast du dir schon einmal gewünscht, deinen Heimatsender auf deinem FM-Radio empfangen zu können, während du unterwegs bist? Dann ist dieses Projekt genau das Richtige für dich!
