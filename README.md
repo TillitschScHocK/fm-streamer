@@ -47,3 +47,5 @@ Die Software nutzt die [ESP8266Audio](https://github.com/earlephilhower/ESP8266A
 
 <img src="./docs/software-diagram.png" width="600" />
 
+Ein besonderer Dank gilt [russery](https://github.com/russery), ohne den dieses Projekt nicht das wäre, was es heute ist.
+
